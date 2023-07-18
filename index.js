@@ -20,6 +20,8 @@ const REQUEST_JSON = {
 };
 
 
+
+
 // OBJECTS
 
 // NOTE: Using a proper 'class' definition is significantly slower
@@ -34,7 +36,35 @@ function JishoRecord(entry) {
     };
 }
 
-// ENTRYPOINTS
+// ENDPOINTS
+
+async function getEntries(query, is_common = False) {
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+    const query_blocks = [query];
+
+    if (is_common) {
+        query_blocks.unshift('#common');
+    }
+    return execute_query(query_blocks);
+}
+
+
+async function getCommonEntries(query) {
+    return getEntries(query, true);
+}
+
+
+// TODO: endpoint currently not supported by API server!
+async function getKanjiEntries(query) {
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+
+    return execute_query(['#kanji', query]);
+}
+
 
 /** 
  * [execute_query Core function to get results from the Jisho API]
@@ -62,34 +92,6 @@ async function execute_query(query_blocks) {
         `HTTP ${response.status}: Couldn't get results for query '${query_string}'.`
         + ' Check if API server is available and the query correct.'
     );
-}
-
-
-async function getEntries(query, is_common = False) {
-    if (typeof query !== 'string') {
-        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
-    }
-    const query_blocks = [query];
-
-    if (is_common) {
-        query_blocks.unshift('#common');
-    }
-    return execute_query(query_blocks);
-}
-
-
-async function getCommonEntries(query) {
-    return getEntries(query, true);
-}
-
-
-async function getKanjiEntries(query) {
-    // TODO: Move check to a higher level?
-    if (typeof query !== 'string') {
-        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
-    }
-
-    return execute_query(['#kanji', query]);
 }
 
 
@@ -137,10 +139,11 @@ async function extractJishoData(response) {
 
 // TESTING GROUNDS
 
-getCommonEntries("道具").then(results => console.log(results)).catch((error) => {
+getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
     console.error(error);
 });
 
-getKanjiEntries("道具").then(results => console.log(results)).catch((error) => {
-    console.error(error);
-});
+// TODO: Currently not supported by API!
+// getKanjiEntries('道').then(results => console.log(results)).catch((error) => {
+//     console.error(error);
+// });
