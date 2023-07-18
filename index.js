@@ -56,6 +56,32 @@ async function getCommonEntries(query) {
 }
 
 
+async function getEntriesStartingWith(query, is_common = false) {
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+
+    const query_string = `${query}*`;
+    if (is_common) {
+        return getCommonEntries(query_string);
+    }
+    return getEntries(query_string);
+}
+
+
+async function getEntriesEndingWith(query, is_common = false) {
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+
+    const query_string = `*${query}`;
+    if (is_common) {
+        return getCommonEntries(query_string);
+    }
+    return getEntries(query_string);
+}
+
+
 // TODO: endpoint currently not supported by API server!
 async function getKanjiEntries(query) {
     if (typeof query !== 'string') {
