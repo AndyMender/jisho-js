@@ -44,6 +44,7 @@ async function getEntries(query, is_common = False) {
     if (is_common) {
         query_blocks.unshift('#common');
     }
+
     const response_json = await execute_query(query_blocks);
     return extractJishoData(response_json);
 }
@@ -69,6 +70,21 @@ async function getEntriesEndingWith(query, is_common = false) {
     return getEntries(`*${query}`, is_common);
 }
 
+async function getEntriesAdjective(query, is_common = false) {
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+    const query_blocks = ['#adjective', query];
+
+    if (is_common) {
+        query_blocks.unshift('#common');
+    }
+
+    const response_json = await execute_query(query_blocks);
+    return extractJishoData(response_json);
+}
+
+// TODO: Make entry calls stackable?
 async function getEntriesJLPTLevel(query, jlpt_level) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
@@ -87,18 +103,19 @@ async function getEntriesJLPTLevel(query, jlpt_level) {
             jlpt_string += `n${jlpt_level}` ;
         }
     }
+
     const response_json = await execute_query([jlpt_string, query]);
     return extractJishoData(response_json);
 }
 
 
 // TODO: endpoint currently not supported by API server!
-async function getKanjiEntries(query) {
-    if (typeof query !== 'string') {
-        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
-    }
-    return await execute_query(['#kanji', query]);
-}
+// async function getKanjiEntries(query) {
+//     if (typeof query !== 'string') {
+//         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+//     }
+//     return await execute_query(['#kanji', query]);
+// }
 
 
 /** 
@@ -170,15 +187,23 @@ async function extractJishoData(response_json) {
 
 // TESTING GROUNDS
 
-// getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
-//     console.error(error);
-// });
-
-getEntriesJLPTLevel('地', 3).then(results => console.log(results)).catch((error) => {
-    console.error(error);
-});
-
 // TODO: Currently not supported by API!
 // getKanjiEntries('道').then(results => console.log(results)).catch((error) => {
 //     console.error(error);
 // });
+
+
+// getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
+//     console.error(error);
+// });
+
+
+// getEntriesJLPTLevel('地', 3).then(results => console.log(results)).catch((error) => {
+//     console.error(error);
+// });
+
+
+getEntriesAdjective('地', true).then(results => console.log(results)).catch((error) => {
+    console.error(error);
+});
+
