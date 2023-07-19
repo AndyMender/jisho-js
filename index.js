@@ -69,6 +69,28 @@ async function getEntriesEndingWith(query, is_common = false) {
     return getEntries(`*${query}`, is_common);
 }
 
+async function getEntriesJLPTLevel(query, jlpt_level) {
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+    let jlpt_string = '#jlpt-';
+
+    if (typeof jlpt_level === 'number') {
+        jlpt_string += `n${jlpt_level}`;
+    } else if (typeof jlpt_level === 'string') {
+        // Assume 'N*' or 'n*' JLPT-style level String
+        if (jlpt_level.startsWith('N') || jlpt_level.startsWith('n')) {
+            jlpt_string += jlpt_level.toLowerCase();
+        } 
+        // Assume number passed as String
+        else {
+            jlpt_string += `n${jlpt_level}` ;
+        }
+    }
+    const response_json = await execute_query([jlpt_string, query]);
+    return extractJishoData(response_json);
+}
+
 
 // TODO: endpoint currently not supported by API server!
 async function getKanjiEntries(query) {
@@ -148,11 +170,13 @@ async function extractJishoData(response_json) {
 
 // TESTING GROUNDS
 
-getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
+// getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
+//     console.error(error);
+// });
+
+getEntriesJLPTLevel('地', 3).then(results => console.log(results)).catch((error) => {
     console.error(error);
 });
-
-
 
 // TODO: Currently not supported by API!
 // getKanjiEntries('道').then(results => console.log(results)).catch((error) => {
