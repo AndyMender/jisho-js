@@ -29,7 +29,8 @@ function JishoRecord(entry) {
         jlpt_level: extractJLPTLevel(entry),
         wanikani_level: extractWaniKaniLevel(entry),
         reading: extractReading(entry),
-        meanings: extractMeanings(entry)
+        meanings: extractMeanings(entry),
+        word_type: extractWordType(entry)
     };
 }
 
@@ -70,15 +71,9 @@ async function getEntriesEndingWith(query, is_common = false) {
     return getEntries(`*${query}`, is_common);
 }
 
-async function getEntriesAdjective(query, is_common = false) {
-    if (typeof query !== 'string') {
-        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
-    }
-    const query_blocks = ['#adjective', query];
-
-    if (is_common) {
-        query_blocks.unshift('#common');
-    }
+// TODO: This doesn't actually work - the API returns nouns!
+async function getEntriesAdjective() {
+    const query_blocks = ['#adjective']
 
     const response_json = await execute_query(query_blocks);
     return extractJishoData(response_json);
@@ -171,11 +166,23 @@ function extractReading(entry) {
 
 
 function extractMeanings(entry) {
-    const meanings = [];
+    let meanings = [];
     for (const meaning_block of entry.senses) {
-        meanings.push(meaning_block.english_definitions.join(", "));
+        meanings = meanings.concat(meaning_block.english_definitions);
     }
+    // TODO: Remove duplicates with different cases!
     return meanings;
+}
+
+
+function extractWordType(entry) {
+    let word_types = [];
+    for (const type_block of entry.senses) {
+        word_types = word_types.concat(type_block.parts_of_speech);
+    }
+    // TODO: The word types are a mess, filter out duplicates!
+    return word_types
+        .filter(element => !element.includes("Wikipedia"));
 }
 
 
@@ -203,7 +210,6 @@ async function extractJishoData(response_json) {
 // });
 
 
-getEntriesAdjective('地', true).then(results => console.log(results)).catch((error) => {
+getEntriesAdjective().then(results => console.log(results)).catch((error) => {
     console.error(error);
 });
-
