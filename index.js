@@ -6,7 +6,6 @@
 // TODO: Are other arguments allowed?
 const JISHO_API_URL = "https://jisho.org/api/v1/search/words?keyword=";
 
-
 const REQUEST_HEADERS = new Headers();
 REQUEST_HEADERS.append('content-type', 'application/json');
 REQUEST_HEADERS.append('accept', 'application/json');
@@ -18,8 +17,6 @@ const REQUEST_JSON = {
   mode: "cors",
   cache: "default",
 };
-
-
 
 
 // OBJECTS
@@ -47,7 +44,8 @@ async function getEntries(query, is_common = False) {
     if (is_common) {
         query_blocks.unshift('#common');
     }
-    return execute_query(query_blocks);
+    const response_json = await execute_query(query_blocks);
+    return extractJishoData(response_json);
 }
 
 
@@ -60,12 +58,7 @@ async function getEntriesStartingWith(query, is_common = false) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
     }
-
-    const query_string = `${query}*`;
-    if (is_common) {
-        return getCommonEntries(query_string);
-    }
-    return getEntries(query_string);
+    return getEntries(`${query}*`, is_common);
 }
 
 
@@ -73,12 +66,7 @@ async function getEntriesEndingWith(query, is_common = false) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
     }
-
-    const query_string = `*${query}`;
-    if (is_common) {
-        return getCommonEntries(query_string);
-    }
-    return getEntries(query_string);
+    return getEntries(`*${query}`, is_common);
 }
 
 
@@ -87,8 +75,7 @@ async function getKanjiEntries(query) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
     }
-
-    return execute_query(['#kanji', query]);
+    return await execute_query(['#kanji', query]);
 }
 
 
@@ -105,14 +92,12 @@ async function execute_query(query_blocks) {
 
     const request = new Request(fullURL, REQUEST_JSON);
     const response = await fetch(request);
-    // console.log(request.headers);
-    // console.log(response.headers);
 
     // NOTE: The Jisho Web API almost always returns HTTP 200,
     // because there is some result to return
     if (response.status === 200) {
         console.debug(`Response for query '${query_string}' received.`);
-        return await extractJishoData(response);
+        return await response.json();
     }
     throw new Error(
         `HTTP ${response.status}: Couldn't get results for query '${query_string}'.`
@@ -155,9 +140,7 @@ function extractMeanings(entry) {
 }
 
 
-async function extractJishoData(response) {
-    const response_json = await response.json();
-
+async function extractJishoData(response_json) {
     // Extract and transform the data block
     return response_json.data.map(entry => JishoRecord(entry));
 }
@@ -168,6 +151,8 @@ async function extractJishoData(response) {
 getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
     console.error(error);
 });
+
+
 
 // TODO: Currently not supported by API!
 // getKanjiEntries('道').then(results => console.log(results)).catch((error) => {
