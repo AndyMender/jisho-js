@@ -88,6 +88,24 @@ async function getEntriesJLPTLevel(query, jlpt_level) {
 }
 
 
+async function GetEntriesWasei(query, is_common = false) {
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+    if (typeof query !== 'string') {
+        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+    }
+    const query_blocks = ['#wasei', query];
+
+    if (is_common) {
+        query_blocks.unshift('#common');
+    }
+
+    const response_json = await execute_query(query_blocks);
+    return extractJishoData(response_json);
+}
+
+
 // TODO: endpoint supported via Web UI, but not via API server!
 // async function getKanjiEntries(grade) {
 //     if (typeof grade !== 'number') {
@@ -187,6 +205,10 @@ async function extractJishoData(response_json) {
 // });
 
 
-getEntriesJLPTLevel('地', 'N3').then(results => console.log(results)).catch((error) => {
+// getEntriesJLPTLevel('地', 'N3').then(results => console.log(results)).catch((error) => {
+//     console.error(error);
+// });
+
+GetEntriesWasei('ボ', true).then(results => console.log(results)).catch((error) => {
     console.error(error);
 });
