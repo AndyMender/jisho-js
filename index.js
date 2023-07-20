@@ -152,21 +152,25 @@ function extractReading(entry) {
 function extractMeanings(entry) {
     let meanings = [];
     for (const meaning_block of entry.senses) {
-        meanings = meanings.concat(meaning_block.english_definitions);
+        meanings = meanings.concat(
+            meaning_block.english_definitions.
+                map(entry => entry.toLowerCase())
+        );
     }
-    // TODO: Remove duplicates with different cases!
-    return meanings;
+    return [...new Set(meanings)];
 }
 
 
 function extractWordType(entry) {
     let word_types = [];
     for (const type_block of entry.senses) {
-        word_types = word_types.concat(type_block.parts_of_speech);
+        word_types = word_types.concat(
+            type_block.parts_of_speech
+                .map(entry => entry.toLowerCase())
+                .filter(entry => !entry.includes('wikipedia'))
+        );
     }
-    // TODO: The word types are a mess, filter out duplicates!
-    return word_types
-        .filter(element => !element.includes("Wikipedia"));
+    return [...new Set(word_types)];
 }
 
 
