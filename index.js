@@ -71,45 +71,29 @@ async function getEntriesEndingWith(query, is_common = false) {
     return getEntries(`*${query}`, is_common);
 }
 
-// TODO: This doesn't actually work - the API returns nouns!
-async function getEntriesAdjective() {
-    const query_blocks = ['#adjective']
 
-    const response_json = await execute_query(query_blocks);
-    return extractJishoData(response_json);
-}
-
-// TODO: Make entry calls stackable?
 async function getEntriesJLPTLevel(query, jlpt_level) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
     }
-    let jlpt_string = '#jlpt-';
 
-    if (typeof jlpt_level === 'number') {
-        jlpt_string += `n${jlpt_level}`;
-    } else if (typeof jlpt_level === 'string') {
-        // Assume 'N*' or 'n*' JLPT-style level String
-        if (jlpt_level.startsWith('N') || jlpt_level.startsWith('n')) {
-            jlpt_string += jlpt_level.toLowerCase();
-        } 
-        // Assume number passed as String
-        else {
-            jlpt_string += `n${jlpt_level}` ;
-        }
-    }
+    const jlpt_regex = /[Nn]?/;
+    if (typeof jlpt_level !== 'string' && !jlpt_level.match(jlpt_regex)) {
+        throw new Error(`JLPT level needs to be in the format 'N3' or 'n3'. Got '${jlpt_level}' instead. Aborting!`);
+    }   
+    const jlpt_string = `#jlpt-${jlpt_level.toLowerCase()}`;
 
     const response_json = await execute_query([jlpt_string, query]);
     return extractJishoData(response_json);
 }
 
 
-// TODO: endpoint currently not supported by API server!
-// async function getKanjiEntries(query) {
-//     if (typeof query !== 'string') {
-//         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
+// TODO: endpoint supported via Web UI, but not via API server!
+// async function getKanjiEntries(grade) {
+//     if (typeof grade !== 'number') {
+//         throw new Error(`Value of 'grade' must be a number. Instead got '${grade}'. Aborting!`)
 //     }
-//     return await execute_query(['#kanji', query]);
+//     return await execute_query([ `#grade:${grade}`, '#kanji']);
 // }
 
 
@@ -194,22 +178,11 @@ async function extractJishoData(response_json) {
 
 // TESTING GROUNDS
 
-// TODO: Currently not supported by API!
-// getKanjiEntries('道').then(results => console.log(results)).catch((error) => {
-//     console.error(error);
-// });
-
-
 // getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
 //     console.error(error);
 // });
 
 
-// getEntriesJLPTLevel('地', 3).then(results => console.log(results)).catch((error) => {
-//     console.error(error);
-// });
-
-
-getEntriesAdjective().then(results => console.log(results)).catch((error) => {
+getEntriesJLPTLevel('地', 'N3').then(results => console.log(results)).catch((error) => {
     console.error(error);
 });
