@@ -2,8 +2,8 @@
     Main module entrypoint.
 */
 
+
 // CONSTANTS
-// TODO: Are other arguments allowed?
 const JISHO_API_URL = "https://jisho.org/api/v1/search/words?keyword=";
 
 const REQUEST_HEADERS = new Headers();
@@ -22,6 +22,11 @@ const REQUEST_JSON = {
 // OBJECTS
 
 // NOTE: Using a proper 'class' definition is significantly slower
+/** 
+ * [JishoRecord Converts an entry from the Jisho Web API into a simplified form]
+ * @param   {Object}    entry [Entry from the Jisho Web API]
+ * @return  {Object}          [Array of jisho results objects]
+ */
 function JishoRecord(entry) {
     return {
         slug: entry.slug,
@@ -30,13 +35,20 @@ function JishoRecord(entry) {
         wanikani_level: extractWaniKaniLevel(entry),
         reading: extractReading(entry),
         meanings: extractMeanings(entry),
-        word_type: extractWordType(entry)
+        word_type: extractWordTypes(entry)
     };
 }
 
+
 // ENDPOINTS
 
-async function getEntries(query, is_common = False) {
+/** 
+ * [getEntries Gets records from the Jisho Web API]
+ * @param   {string}    query           [Query word to send to the API]
+ * @param   {boolean}   is_commmon      [Flag to query for common vocabulary]
+ * @return  {Array}                     [Array of JishoRecord objects]
+ */
+async function getEntries(query, is_common = false) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
     }
@@ -51,11 +63,22 @@ async function getEntries(query, is_common = False) {
 }
 
 
+/** 
+ * [getCommonEntries Get only common entries for a given query]
+ * @param   {string}     query   [Query word to send to the API]
+ * @return  {Array}              [Array of JishoRecord objects]
+ */
 async function getCommonEntries(query) {
     return getEntries(query, true);
 }
 
 
+/** 
+ * [getEntriesStartingWith Get results for a word starting with a given query]
+ * @param   {string}    query           [Query word to send to the API]
+ * @param   {boolean}   is_commmon      [Flag to query for common vocabulary]
+ * @return  {Array}                     [Array of JishoRecord objects]
+ */
 async function getEntriesStartingWith(query, is_common = false) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
@@ -64,6 +87,12 @@ async function getEntriesStartingWith(query, is_common = false) {
 }
 
 
+/** 
+ * [getEntriesEndingWith Get results for a word ending with a given query]
+ * @param   {string}    query           [Query word to send to the API]
+ * @param   {boolean}   is_commmon      [Flag to query for common vocabulary]
+ * @return  {Array}                     [Array of JishoRecord objects]
+ */
 async function getEntriesEndingWith(query, is_common = false) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
@@ -72,6 +101,12 @@ async function getEntriesEndingWith(query, is_common = false) {
 }
 
 
+/** 
+ * [getEntriesJLPTLevel Get results for a given JLPT level]
+ * @param   {string}    query           [Query word to send to the API]
+ * @param   {string}    jlpt_level      [JLPT level in the Nx or nx format]
+ * @return  {Array}                     [Array of JishoRecord objects]
+ */
 async function getEntriesJLPTLevel(query, jlpt_level) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
@@ -87,11 +122,13 @@ async function getEntriesJLPTLevel(query, jlpt_level) {
     return extractJishoData(response_json);
 }
 
-
-async function GetEntriesWasei(query, is_common = false) {
-    if (typeof query !== 'string') {
-        throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
-    }
+/** 
+ * [getEntriesWasei Get wasei eigo results for a given query]
+ * @param   {string}    query           [Query word to send to the API]
+ * @param   {boolean}   is_commmon      [Flag to query for common vocabulary]
+ * @return  {Array}                     [Array of JishoRecord objects]
+ */
+async function getEntriesWasei(query, is_common = false) {
     if (typeof query !== 'string') {
         throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
     }
@@ -106,20 +143,11 @@ async function GetEntriesWasei(query, is_common = false) {
 }
 
 
-// TODO: endpoint supported via Web UI, but not via API server!
-// async function getKanjiEntries(grade) {
-//     if (typeof grade !== 'number') {
-//         throw new Error(`Value of 'grade' must be a number. Instead got '${grade}'. Aborting!`)
-//     }
-//     return await execute_query([ `#grade:${grade}`, '#kanji']);
-// }
-
-
 /** 
  * [execute_query Core function to get results from the Jisho API]
- * @param   {[Array]}  query_blocks [Query words to send to the API]
- * @return  {[Array]}               [Array of jisho results objects]
- * */ 
+ * @param   {Array}  query_blocks [Query words to send to the API]
+ * @return  {Array}               [Array of jisho results objects]
+ */
 async function execute_query(query_blocks) {
     const query_string = query_blocks.join(' ');
     const encoded_query = query_blocks.map(entry => encodeURIComponent(entry)).join(' ');
@@ -144,6 +172,11 @@ async function execute_query(query_blocks) {
 
 // UTILITY FUNCTIONS
 
+/** 
+ * [extractJLPTLevel Extract the JLPT level from a Jisho API response record]
+ * @param   {Object}  entry     [record in a Jisho API response]
+ * @return  {string}            [JLPT level in the format 'Nx']
+ */
 function extractJLPTLevel(entry) {
     const jlpt_block = entry.jlpt[0];
     if (jlpt_block === undefined) return '';
@@ -152,7 +185,11 @@ function extractJLPTLevel(entry) {
         .toUpperCase();
 }
 
-
+/** 
+ * [extractWaniKaniLevel Extract the WaniKani level from a Jisho API response record]
+ * @param   {Object}  entry     [record in a Jisho API response]
+ * @return  {string}            [WaniKani level]
+ */
 function extractWaniKaniLevel(entry) {
     const tags_block = entry.tags[0];
     if (tags_block === undefined) return '';
@@ -160,13 +197,21 @@ function extractWaniKaniLevel(entry) {
         .replace('wanikani', '');
 }
 
-
+/** 
+ * [extractReading Extract the word reading from a Jisho API response record]
+ * @param   {Object}  entry     [record in a Jisho API response]
+ * @return  {string}            [reading]
+ */
 function extractReading(entry) {
     const reading = entry.japanese[0].reading;
     return reading;
 }
 
-
+/** 
+ * [extractMeanings Extract a word's meanings from a Jisho API response record]
+ * @param   {Object}  entry     [record in a Jisho API response]
+ * @return  {Array}             [array of unique word meanings]
+ */
 function extractMeanings(entry) {
     let meanings = [];
     for (const meaning_block of entry.senses) {
@@ -178,8 +223,12 @@ function extractMeanings(entry) {
     return [...new Set(meanings)];
 }
 
-
-function extractWordType(entry) {
+/** 
+ * [extractWordTypes Extract a word's grammatical types from a Jisho API response record]
+ * @param   {Object}  entry     [record in a Jisho API response]
+ * @return  {Array}             [array of unique word grammatical types]
+ */
+function extractWordTypes(entry) {
     let word_types = [];
     for (const type_block of entry.senses) {
         word_types = word_types.concat(
@@ -191,7 +240,11 @@ function extractWordType(entry) {
     return [...new Set(word_types)];
 }
 
-
+/** 
+ * [extractJishoData Converts Jisho API response records into JishoRecord entries]
+ * @param   {Array}  response_json      [array of records in a Jisho API response]
+ * @return  {Array}                     [array of JishoRecord Objects]
+ */
 async function extractJishoData(response_json) {
     // Extract and transform the data block
     return response_json.data.map(entry => JishoRecord(entry));
@@ -199,16 +252,18 @@ async function extractJishoData(response_json) {
 
 
 // TESTING GROUNDS
+getEntries('道具').then(results => console.log(results)).catch((error) => {
+    console.error(error);
+});
 
 // getCommonEntries('道具').then(results => console.log(results)).catch((error) => {
 //     console.error(error);
 // });
 
-
 // getEntriesJLPTLevel('地', 'N3').then(results => console.log(results)).catch((error) => {
 //     console.error(error);
 // });
 
-GetEntriesWasei('ボ', true).then(results => console.log(results)).catch((error) => {
-    console.error(error);
-});
+// getEntriesWasei('ボ', true).then(results => console.log(results)).catch((error) => {
+//     console.error(error);
+// });
