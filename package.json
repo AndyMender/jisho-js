@@ -1,0 +1,40 @@
+{
+  "name": "jisho-js",
+  "version": "0.0.1a",
+  "description": "JavaScript wrapper around the jisho.org search Web API.",
+  "main": "./src/jisho-js.js",
+  "type": "module",
+  "exports": {
+    "import": "./src/jisho-js.js",
+    "require": "./src/jisho-js.cjs"
+  },
+  "scripts": {
+    "test": "mocha test -R spec --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndyMender/jisho-js.git"
+  },
+  "keywords": [
+    "dictionary",
+    "japanese",
+    "jisho",
+    "kanji"
+  ],
+  "author": "AndyMender",
+  "license": "BSD 3-Clause",
+  "bugs": {
+    "url": "https://github.com/AndyMender/jisho-js/issues"
+  },
+  "homepage": "https://github.com/AndyMender/jisho-js/#README",
+  "dependencies": {
+    "jsdoc": "^4.0.2",
+    "mocha": "^10.2.0",
+    "unit.js": "^2.1.1"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.2",
+    "mocha": "^10.2.0",
+    "unit.js": "^2.1.1"
+  }
+}
