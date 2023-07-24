@@ -1,5 +1,5 @@
 {
-  "name": "jisho-js",
+  "name": "@andymenderunix/jisho-js",
   "version": "0.0.1a",
   "description": "JavaScript wrapper around the jisho.org search Web API.",
   "main": "./src/jisho-js.js",
