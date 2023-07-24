@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+- "20.2.0"
+deploy:
+  on:
+    tags: true
+  provider: npm
+  email: andymenderunix@gmail.com
+  api_key:
+    secure: Dp8nymRUp4YxU8fUDuE15WVapJgaoZZaEq9Y6qllonQM4s6eU72Lhx0kPhXxdedSpRrAc/qTPno4+Ne3xvxrRT0WFV6p1sT90gq3zdKoCIxtYZRPGCN77lffMJkM5gohuOHxzETaGQw5/Fvi3Sd1HR074MYAfYjFAd1j5+1iV0/VzoheiBOBvUj74myYu+juNnALz9Ko768t+DTLQT43fuj72zulkYXto/6gR7V4OJmyMH4zNhukG79CqwYf+XegmP765xM1A2EFPEL48hm8Qiwjv8yGtyo393JuwJJmaqg30i3O3J9gOycwd5p33/6UDgC4e52hq9Yje/gaJDvikO0QWim2Rk3OgKpbLLrjYbRH6wNCW3hONJpR0sLslHSPeSHL7YmsCrP9vTgVKAsg39VaHirFEbw4WVEzRfluWiae6hh1Yw0TacxKTrxaHGJf3C95KJ0eueph1CiShK4Oyzsr98zCWb+KgFd/ikEzv5jdH34n12hklvUS4++0oVBut7KMJyrPSRSmhtU2+bCh/EO4ty74zJsonaJsdHUFTZWcWdJSQSNYDeD5i12WxzfhLCODquqjb5sfJOMolWCmlcHPG+K1/DBKJM2JskiJUeQ7GqOpAkbneQD2HLuSfBh6nEwg1P503FQ1J6VkPHVBzJI5I7gcAqhG/tMEYprMTt8=
