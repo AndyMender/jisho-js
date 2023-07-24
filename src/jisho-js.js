@@ -175,7 +175,7 @@ class JishoAPI {
         if (typeof query !== 'string') {
             throw new Error(`Query value '${query}' is incompatible. It must be a string. Aborting!`);
         }
-        return getEntries(`*${query}`, is_common);
+        return this.getEntries(`*${query}`, is_common);
     }
 
     /** 
